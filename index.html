@@ -1467,7 +1467,27 @@
             "Definir proceso claro de escalamiento técnico 24/7",
             "Realizar simulacros de disaster recovery trimestralmente",
             "Documentar casos de uso específicos de detección de fraude",
-            "Establecer canal directo de comunicación con reguladores bancarios"
+            "Establecer canal directo de comunicación con reguladores bancarios",
+            "Implementar data lineage completo para auditorías de cumplimiento",
+            "Crear dashboard ejecutivo con métricas de negocio en tiempo real",
+            "Establecer programa de capacitación continua para el equipo de ML",
+            "Implementar circuit breakers para prevenir cascadas de fallos",
+            "Definir matriz RACI clara para todos los procesos ITIL",
+            "Realizar code reviews obligatorios antes de cualquier despliegue",
+            "Mantener documentación técnica actualizada con cada release",
+            "Implementar logging estructurado para facilitar troubleshooting",
+            "Crear cultura de blameless postmortems para aprendizaje organizacional",
+            "Establecer proceso de gestión de configuración riguroso",
+            "Implementar observabilidad completa: logs, métricas y traces distribuidos",
+            "Definir estrategia de comunicación de crisis ante incidentes críticos",
+            "Realizar análisis de impacto de negocio antes de cada cambio mayor",
+            "Implementar automated testing en pipeline CI/CD con cobertura >80%",
+            "Establecer proceso de knowledge transfer ante rotación de personal",
+            "Crear inventario actualizado de assets y dependencias del sistema",
+            "Implementar chaos engineering para validar resiliencia del sistema",
+            "Definir umbrales de alertas basados en percentiles, no en promedios",
+            "Establecer proceso de peer review para nuevos features del modelo",
+            "Implementar validación cruzada de datos entre sistemas críticos"
         ];
 
         const sampleKnowledge = [
@@ -1540,6 +1560,86 @@
                 title: "Gestión de stakeholders en proyectos de IA",
                 content: "Comunicar regularmente con: ejecutivos (métricas de negocio), áreas técnicas (arquitectura y rendimiento), compliance (riesgos regulatorios), usuarios finales (usabilidad). Adaptar lenguaje a cada audiencia y mantener transparencia.",
                 category: "PMBOK 7"
+            },
+            {
+                title: "Feature engineering para detección de fraudes",
+                content: "Crear features como: velocidad de transacciones, patrones de gasto por hora/día, desviación del comportamiento histórico, geolocalización inusual, cambios en métodos de pago. Usar técnicas de agregación temporal (rolling windows) y codificación de variables categóricas.",
+                category: "Machine Learning"
+            },
+            {
+                title: "Gestión de falsos positivos en sistemas antifraude",
+                content: "Implementar: 1) Threshold dinámico basado en perfil de cliente, 2) Modelos de segunda capa para refinar predicciones, 3) Feedback loop con analistas, 4) Análisis de costo-beneficio por tipo de falso positivo, 5) Dashboard de monitoreo de precision/recall.",
+                category: "Operaciones"
+            },
+            {
+                title: "Implementación de CI/CD para modelos ML",
+                content: "Pipeline debe incluir: 1) Validación de datos de entrada, 2) Ejecución de tests automatizados, 3) Evaluación de métricas del modelo, 4) Comparación con modelo baseline, 5) Despliegue gradual (canary), 6) Monitoreo post-despliegue, 7) Rollback automático si métricas caen.",
+                category: "MLOps"
+            },
+            {
+                title: "Técnicas de ensemble para mejorar precisión",
+                content: "Combinar múltiples modelos: Random Forest + XGBoost + LightGBM mediante voting o stacking. Usar bagging para reducir varianza y boosting para reducir sesgo. Validar que mejora sea estadísticamente significativa antes de implementar en producción.",
+                category: "Machine Learning"
+            },
+            {
+                title: "Gestión de configuración en proyectos de IA",
+                content: "Versionar: código, datos de entrenamiento, hiperparámetros, dependencias (requirements.txt), configuración de infraestructura (IaC). Usar herramientas como DVC para datos, Git para código, y Docker para ambientes reproducibles.",
+                category: "DevOps"
+            },
+            {
+                title: "Estrategia de datos para entrenamiento de modelos",
+                content: "Mantener: 1) Dataset histórico limpio y versionado, 2) Pipeline de etiquetado eficiente, 3) Estratificación correcta de clases, 4) Validación cruzada temporal para series de tiempo, 5) Datasets sintéticos para casos raros, 6) Proceso de anonimización para cumplimiento.",
+                category: "Datos"
+            },
+            {
+                title: "Optimización de hiperparámetros en modelos ML",
+                content: "Usar técnicas como: Grid Search para espacios pequeños, Random Search para exploración, Bayesian Optimization para convergencia rápida, Optuna o Hyperopt para casos complejos. Siempre validar en conjunto holdout separado para evitar overfitting del proceso de tuning.",
+                category: "Machine Learning"
+            },
+            {
+                title: "Gestión de incidentes críticos en sistemas ML",
+                content: "Definir procedimiento: 1) Detección automática (alertas), 2) War room virtual inmediato, 3) Comunicación a stakeholders, 4) Rollback a versión estable, 5) Análisis de causa raíz, 6) Implementación de fix, 7) Post-mortem sin culpables, 8) Actualización de runbooks.",
+                category: "ITIL 4"
+            },
+            {
+                title: "Métricas de negocio para sistemas antifraude",
+                content: "Monitorear: 1) Pérdidas evitadas por fraude detectado, 2) ROI del sistema, 3) Tasa de fricción en clientes legítimos, 4) Tiempo de respuesta de alertas, 5) Costo operativo por transacción analizada, 6) Tasa de conversión post-alerta, 7) NPS de usuarios del sistema.",
+                category: "Negocio"
+            },
+            {
+                title: "Estrategia de seguridad para sistemas de IA",
+                content: "Implementar: 1) Encriptación de datos en reposo y tránsito, 2) Autenticación y autorización robusta, 3) Auditoría de accesos, 4) Detección de adversarial attacks, 5) Sanitización de inputs, 6) Rate limiting en APIs, 7) Monitoreo de anomalías de seguridad.",
+                category: "Seguridad"
+            },
+            {
+                title: "Gestión del cambio organizacional en proyectos IA",
+                content: "Aplicar modelo ADKAR: 1) Awareness (conciencia de la necesidad), 2) Desire (deseo de participar), 3) Knowledge (conocimiento de cómo cambiar), 4) Ability (habilidad de implementar), 5) Reinforcement (refuerzo para sostener el cambio). Involucrar a champions desde el inicio.",
+                category: "PMBOK 7"
+            },
+            {
+                title: "Análisis de causa raíz en degradación de modelos",
+                content: "Investigar: 1) Data drift (cambio en distribución de features), 2) Concept drift (cambio en relación X-Y), 3) Cambios en upstream systems, 4) Estacionalidad no capturada, 5) Eventos externos (pandemia, crisis), 6) Bugs en pipeline de datos. Usar técnica 5 Whys e Ishikawa.",
+                category: "ITIL 4"
+            },
+            {
+                title: "Estrategia de documentación técnica para ML",
+                content: "Documentar: 1) Arquitectura del sistema (diagramas), 2) Model cards con características del modelo, 3) Datasheets de datasets utilizados, 4) Runbooks operacionales, 5) API documentation, 6) Decisiones de diseño y trade-offs, 7) Known issues y limitaciones.",
+                category: "Documentación"
+            },
+            {
+                title: "Técnicas de balanceo de clases en datasets",
+                content: "Para datasets desbalanceados: 1) Oversampling de clase minoritaria (SMOTE), 2) Undersampling de clase mayoritaria, 3) Class weights en función de costo, 4) Ensemble methods con diferentes balances, 5) Anomaly detection en lugar de clasificación binaria.",
+                category: "Machine Learning"
+            },
+            {
+                title: "Implementación de feedback loops en sistemas ML",
+                content: "Crear ciclo: 1) Recopilar feedback de analistas sobre predicciones, 2) Almacenar en database de ground truth, 3) Analizar patrones de errores, 4) Re-etiquetar datos ambiguos, 5) Reentrenar modelo periódicamente, 6) Evaluar mejora con A/B test, 7) Desplegar si hay ganancia significativa.",
+                category: "MLOps"
+            },
+            {
+                title: "Gestión de la deuda técnica en proyectos ML",
+                content: "Identificar y priorizar: 1) Código duplicado o mal estructurado, 2) Tests insuficientes, 3) Modelos obsoletos aún en producción, 4) Pipelines manuales susceptibles a errores, 5) Documentación desactualizada. Asignar sprints dedicados para reducir deuda técnica.",
+                category: "Ingeniería de Software"
             }
         ];
 
@@ -2627,10 +2727,37 @@
             });
         });
 
+        // Cargar datos iniciales
+        function loadInitialData() {
+            // Cargar 10 conocimientos iniciales
+            for (let i = 0; i < 10; i++) {
+                const kb = createRandomRecord('conocimiento');
+                if (kb) allData.conocimientos.push(kb);
+            }
+            
+            // Cargar 15 lecciones iniciales
+            for (let i = 0; i < 15; i++) {
+                const lesson = createRandomRecord('leccion');
+                if (lesson) allData.lecciones.push(lesson);
+            }
+            
+            // Cargar algunos registros de cada tipo
+            for (let i = 0; i < 5; i++) {
+                allData.incidentes.push(createRandomRecord('incidente'));
+                allData.problemas.push(createRandomRecord('problema'));
+                allData.cambios.push(createRandomRecord('cambio'));
+                allData.riesgos.push(createRandomRecord('riesgo'));
+                allData.hitos.push(createRandomRecord('hito'));
+            }
+        }
+
         // Inicialización
         function init() {
             updateDateTime();
             setInterval(updateDateTime, 1000);
+            
+            // Cargar datos iniciales
+            loadInitialData();
             
             // Contador de días
             dayInterval = setInterval(() => {
@@ -2656,7 +2783,7 @@
             }, 100);
             
             // Mensaje inicial
-            addActivity('Sistema iniciado correctamente', 'conocimiento');
+            addActivity('Sistema iniciado correctamente - Datos iniciales cargados', 'conocimiento');
         }
 
         // Ejecutar al cargar
