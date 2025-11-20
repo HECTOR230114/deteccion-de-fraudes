@@ -1,0 +1,2524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Detección de Fraudes con IA - ITIL 4 + PMBOK 7</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #003087, #0055ff);
+            color: white;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-left h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .project-info {
+            font-size: 0.85rem;
+            background: rgba(255,255,255,0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .simulation-control {
+            background: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-bottom: 4px solid #0055ff;
+            flex-wrap: wrap;
+        }
+
+        body.dark-mode .simulation-control {
+            background: #2d2d2d;
+        }
+
+        .btn-simulation {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-simulation:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-simulation.paused {
+            background: #ffc107;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.inactive {
+            background: #6c757d;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0,85,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .speed-btn {
+            background: #0055ff;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .speed-btn:hover {
+            background: #003087;
+        }
+
+        .main-nav {
+            background: white;
+            padding: 0.5rem 1.5rem;
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .main-nav {
+            background: #2d2d2d;
+        }
+
+        .nav-tab {
+            background: transparent;
+            border: none;
+            color: #212529;
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        body.dark-mode .nav-tab {
+            color: #b0b0b0;
+        }
+
+        .nav-tab:hover {
+            background: #f8f9fa;
+        }
+
+        body.dark-mode .nav-tab:hover {
+            background: #404040;
+        }
+
+        .nav-tab.active {
+            background: #0055ff;
+            color: white;
+        }
+
+        .main-content {
+            max-width: 1600px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sub-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .sub-tab {
+            background: transparent;
+            border: none;
+            color: #212529;
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        body.dark-mode .sub-tab {
+            color: #b0b0b0;
+        }
+
+        .sub-tab:hover {
+            border-bottom-color: #00a3e0;
+        }
+
+        .sub-tab.active {
+            color: #0055ff;
+            border-bottom-color: #0055ff;
+        }
+
+        .sub-content {
+            display: none;
+        }
+
+        .sub-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .card {
+            background: #2d2d2d;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            color: #0055ff;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            color: #0055ff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #0055ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #003087;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .integration-card {
+            background: linear-gradient(135deg, #003087, #0055ff);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .integration-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .integration-card h4 {
+            margin: 1rem 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .integration-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .progress-container {
+            background: #e9ecef;
+            border-radius: 25px;
+            height: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #28a745, #00a3e0);
+            height: 100%;
+            border-radius: 25px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+        }
+
+        .progress-text {
+            color: white;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.7rem 1rem;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: white;
+            color: #212529;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        body.dark-mode .search-input {
+            background: #2d2d2d;
+            color: white;
+            border-color: #404040;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #0055ff;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .table-container {
+            background: #2d2d2d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        thead {
+            background: #0055ff;
+            color: white;
+        }
+
+        thead th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode tbody tr {
+            border-bottom-color: #404040;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        body.dark-mode tbody tr:hover {
+            background: #404040;
+        }
+
+        tbody td {
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.7rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-primary {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .metric-card {
+            background: #2d2d2d;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0055ff;
+            margin-top: 0.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #0055ff;
+        }
+
+        body.dark-mode .stat-card {
+            background: #2d2d2d;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0055ff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+
+        .stat-trend {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .trend-up {
+            color: #28a745;
+        }
+
+        .trend-down {
+            color: #dc3545;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        body.dark-mode .modal-content {
+            background: #2d2d2d;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #dc3545, #ff6b6b);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .risk-info-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        body.dark-mode .risk-info-item {
+            border-bottom-color: #404040;
+        }
+
+        .risk-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .risk-info-item h4 {
+            color: #0055ff;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: slideInRight 0.3s ease;
+            border-left: 4px solid #0055ff;
+        }
+
+        body.dark-mode .toast {
+            background: #2d2d2d;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.success {
+            border-left-color: #28a745;
+        }
+
+        .toast.warning {
+            border-left-color: #ffc107;
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 350px;
+        }
+
+        body.dark-mode .chart-container {
+            background: #2d2d2d;
+        }
+
+        .knowledge-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #00a3e0;
+        }
+
+        body.dark-mode .knowledge-card {
+            background: #2d2d2d;
+        }
+
+        .knowledge-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .report-card {
+            background: #2d2d2d;
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .stakeholder-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .stakeholder-card {
+            background: #2d2d2d;
+        }
+
+        .stakeholder-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .activity-feed {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .activity-feed {
+            background: #2d2d2d;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-left: 3px solid #0055ff;
+            margin-bottom: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease;
+        }
+
+        body.dark-mode .activity-item {
+            background: #1a1a1a;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .header-left h1 {
+                font-size: 1rem;
+            }
+
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                min-width: 600px;
+                font-size: 0.75rem;
+            }
+
+            thead th, tbody td {
+                padding: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <span style="font-size: 1.5rem;">🛡️</span>
+                <h1>Sistema de Detección de Fraudes con IA</h1>
+            </div>
+            <div class="header-right">
+                <span class="project-info">
+                    Día: <strong id="projectDay">1</strong>
+                </span>
+                <span class="project-info">
+                    Registros: <strong id="totalRecords">0</strong>
+                </span>
+                <span class="project-info" id="currentDateTime"></span>
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Simulation Control -->
+    <div class="simulation-control">
+        <button class="btn-simulation" id="simulationToggle">
+            <span id="simIcon">⏸️</span>
+            <span id="simText">Pausar Simulación</span>
+        </button>
+        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+            <span class="status-indicator" id="statusIndicator"></span>
+            <span id="statusText">Activo - Cada <span id="currentSpeed">5</span>s</span>
+        </div>
+        <div class="speed-control">
+            <span style="font-size: 0.85rem;">⚡ Velocidad:</span>
+            <button class="speed-btn" data-speed="10000">Lento (10s)</button>
+            <button class="speed-btn" data-speed="5000">Normal (5s)</button>
+            <button class="speed-btn" data-speed="2000">Rápido (2s)</button>
+            <button class="speed-btn" data-speed="1000">Muy rápido (1s)</button>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <button class="nav-tab active" data-tab="inicio">🏠 Inicio</button>
+        <button class="nav-tab" data-tab="itil">⚙️ Gestión ITIL</button>
+        <button class="nav-tab" data-tab="pmbok">📋 Gestión PMBOK</button>
+        <button class="nav-tab" data-tab="dashboard">📊 Dashboard</button>
+        <button class="nav-tab" data-tab="analytics">📈 Analytics</button>
+        <button class="nav-tab" data-tab="conocimiento">📚 Base de Conocimientos</button>
+        <button class="nav-tab" data-tab="reportes">📥 Reportes</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Inicio Tab -->
+        <section class="tab-content active" id="inicio">
+            <h2 style="font-size: 2rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                🛡️ Proyecto de Implementación de Sistema de Detección de Fraudes con IA
+            </h2>
+            
+            <div class="grid grid-4">
+                <div class="stat-card" style="border-left-color: #0055ff;">
+                    <div class="stat-value" id="totalIncidents">0</div>
+                    <div class="stat-label">Total Incidentes</div>
+                    <div class="stat-trend trend-up" id="incidentsTrend">↗ +0% esta semana</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #28a745;">
+                    <div class="stat-value" id="resolvedIncidents">0</div>
+                    <div class="stat-label">Incidentes Resueltos</div>
+                    <div class="stat-trend trend-up" id="resolvedTrend">↗ +0%</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #ffc107;">
+                    <div class="stat-value" id="totalRisks">0</div>
+                    <div class="stat-label">Riesgos Activos</div>
+                    <div class="stat-trend" id="risksTrend">→ Sin cambios</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #dc3545;">
+                    <div class="stat-value" id="criticalAlerts">0</div>
+                    <div class="stat-label">Alertas Críticas</div>
+                    <div class="stat-trend trend-down" id="alertsTrend">↘ -0%</div>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>Contexto del Proyecto</h3>
+                    <p style="color: #6c757d; margin-bottom: 1rem;">
+                        Banco Nacional S.A. ha iniciado un proyecto estratégico para implementar un sistema de detección de fraudes utilizando Machine Learning e Inteligencia Artificial. El objetivo es reducir las pérdidas por transacciones fraudulentas en un 85% durante el primer año de operación.
+                    </p>
+                    <p style="color: #6c757d;">
+                        Este proyecto integra las mejores prácticas de <strong>ITIL 4</strong> para la gestión de servicios TI y el marco <strong>PMBOK 7ma edición</strong> para la dirección de proyectos, asegurando una implementación exitosa y sostenible.
+                    </p>
+                </div>
+
+                <div class="activity-feed">
+                    <h3 style="color: #0055ff; margin-bottom: 1rem;">📋 Actividad Reciente</h3>
+                    <div id="activityFeed"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Progreso General del Proyecto</h3>
+                <div class="progress-container">
+                    <div class="progress-bar" id="projectProgress" style="width: 0%">
+                        <span class="progress-text">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-4">
+                <div class="integration-card">
+                    <div style="font-size: 2.5rem;">🎫</div>
+                    <h4>Gestión de Incidentes</h4>
+                    <p>Monitoreo 24/7 de alertas del modelo</p>
+                </div>
+                <div class="integration-card">
+                    <div style="font-size: 2.5rem;">🔧</div>
+                    <h4>Gestión de Problemas</h4>
+                    <p>Análisis de causa raíz de degradación</p>
+                </div>
+                <div class="integration-card">
+                    <div style="font-size: 2.5rem;">🔄</div>
+                    <h4>Gestión de Cambios</h4>
+                    <p>CAB para actualizaciones del modelo</p>
+                </div>
+                <div class="integration-card">
+                    <div style="font-size: 2.5rem;">⚠️</div>
+                    <h4>Gestión de Riesgos</h4>
+                    <p>Identificación y mitigación de riesgos</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ITIL Tab -->
+        <section class="tab-content" id="itil">
+            <div class="sub-nav">
+                <button class="sub-tab active" data-subtab="incidentes" data-parent="itil">Incidentes</button>
+                <button class="sub-tab" data-subtab="problemas" data-parent="itil">Problemas</button>
+                <button class="sub-tab" data-subtab="cambios" data-parent="itil">Cambios</button>
+                <button class="sub-tab" data-subtab="servicedesk" data-parent="itil">Service Desk</button>
+            </div>
+
+            <!-- Incidentes -->
+            <div class="sub-content active" id="incidentes">
+                <div class="section-header">
+                    <h2>🎫 Gestión de Incidentes ITIL 4</h2>
+                </div>
+                <input type="text" placeholder="Buscar incidentes..." class="search-input" id="searchIncidentes">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Severidad</th>
+                                <th>Responsable</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incidentesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Problemas -->
+            <div class="sub-content" id="problemas">
+                <div class="section-header">
+                    <h2>🔧 Gestión de Problemas ITIL 4</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Causa Raíz</th>
+                                <th>Responsable</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="problemasBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Cambios -->
+            <div class="sub-content" id="cambios">
+                <div class="section-header">
+                    <h2>🔄 Gestión de Cambios (CAB)</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Tipo</th>
+                                <th>Impacto</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cambiosBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Service Desk -->
+            <div class="sub-content" id="servicedesk">
+                <div class="section-header">
+                    <h2>👥 Service Desk - Métricas</h2>
+                </div>
+                <div class="grid grid-4">
+                    <div class="metric-card">
+                        <div style="font-size: 2.5rem; color: #0055ff;">⏱️</div>
+                        <h3 style="font-size: 0.85rem; color: #6c757d; margin: 0.5rem 0;">Tiempo Promedio de Resolución</h3>
+                        <p class="metric-value" id="avgResolutionTime">0 horas</p>
+                    </div>
+                    <div class="metric-card">
+                        <div style="font-size: 2.5rem; color: #28a745;">✅</div>
+                        <h3 style="font-size: 0.85rem; color: #6c757d; margin: 0.5rem 0;">Resolución Primer Contacto</h3>
+                        <p class="metric-value" id="firstContactResolution">0%</p>
+                    </div>
+                    <div class="metric-card">
+                        <div style="font-size: 2.5rem; color: #ffc107;">⭐</div>
+                        <h3 style="font-size: 0.85rem; color: #6c757d; margin: 0.5rem 0;">Satisfacción del Usuario</h3>
+                        <p class="metric-value" id="userSatisfaction">0/5.0</p>
+                    </div>
+                    <div class="metric-card">
+                        <div style="font-size: 2.5rem; color: #dc3545;">🎫</div>
+                        <h3 style="font-size: 0.85rem; color: #6c757d; margin: 0.5rem 0;">Incidentes Activos</h3>
+                        <p class="metric-value" id="activeIncidents">0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PMBOK Tab -->
+        <section class="tab-content" id="pmbok">
+            <div class="sub-nav">
+                <button class="sub-tab active" data-subtab="riesgos" data-parent="pmbok">Riesgos</button>
+                <button class="sub-tab" data-subtab="hitos" data-parent="pmbok">Hitos</button>
+                <button class="sub-tab" data-subtab="lecciones" data-parent="pmbok">Lecciones Aprendidas</button>
+                <button class="sub-tab" data-subtab="interesados" data-parent="pmbok">Interesados</button>
+            </div>
+
+            <!-- Riesgos -->
+            <div class="sub-content active" id="riesgos">
+                <div class="section-header">
+                    <h2>⚠️ Gestión de Riesgos PMBOK 7</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Probabilidad</th>
+                                <th>Impacto</th>
+                                <th>Mitigación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riesgosBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Hitos -->
+            <div class="sub-content" id="hitos">
+                <div class="section-header">
+                    <h2>🏁 Hitos del Proyecto</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha Planificada</th>
+                                <th>Descripción</th>
+                                <th>Entregable</th>
+                                <th>Responsable</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hitosBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Lecciones -->
+            <div class="sub-content" id="lecciones">
+                <div class="section-header">
+                    <h2>💡 Lecciones Aprendidas</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Situación</th>
+                                <th>Lección</th>
+                                <th>Categoría</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leccionesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Interesados -->
+            <div class="sub-content" id="interesados">
+                <div class="section-header">
+                    <h2>👥 Gestión de Interesados</h2>
+                </div>
+                <div class="grid grid-3">
+                    <div class="stakeholder-card">
+                        <div style="font-size: 2.5rem;">👔</div>
+                        <h3>Sponsor Ejecutivo</h3>
+                        <p><strong>Gerente General</strong></p>
+                        <p style="font-size: 0.85rem; color: #6c757d;">Interés: Alto | Poder: Alto</p>
+                        <span class="badge badge-success">Comprometido</span>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div style="font-size: 2.5rem;">🛡️</div>
+                        <h3>Director de TI</h3>
+                        <p><strong>CIO</strong></p>
+                        <p style="font-size: 0.85rem; color: #6c757d;">Interés: Alto | Poder: Alto</p>
+                        <span class="badge badge-success">Comprometido</span>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div style="font-size: 2.5rem;">👨‍💻</div>
+                        <h3>Equipo de Desarrollo</h3>
+                        <p><strong>15 profesionales</strong></p>
+                        <p style="font-size: 0.85rem; color: #6c757d;">Interés: Alto | Poder: Medio</p>
+                        <span class="badge badge-primary">Participativo</span>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div style="font-size: 2.5rem;">✅</div>
+                        <h3>Área de Cumplimiento</h3>
+                        <p><strong>Compliance Officer</strong></p>
+                        <p style="font-size: 0.85rem; color: #6c757d;">Interés: Alto | Poder: Alto</p>
+                        <span class="badge badge-warning">Neutral</span>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div style="font-size: 2.5rem;">🔐</div>
+                        <h3>Área de Seguridad</h3>
+                        <p><strong>CISO</strong></p>
+                        <p style="font-size: 0.85rem; color: #6c757d;">Interés: Alto | Poder: Alto</p>
+                        <span class="badge badge-success">Comprometido</span>
+                    </div>
+                    <div class="stakeholder-card">
+                        <div style="font-size: 2.5rem;">👥</div>
+                        <h3>Usuarios Finales</h3>
+                        <p><strong>Analistas de Fraude</strong></p>
+                        <p style="font-size: 0.85rem; color: #6c757d;">Interés: Alto | Poder: Bajo</p>
+                        <span class="badge badge-primary">Participativo</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Tab -->
+        <section class="tab-content" id="dashboard">
+            <div class="section-header">
+                <h2>📊 Dashboard de Indicadores</h2>
+            </div>
+            
+            <div class="grid grid-2">
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Incidentes por Severidad</h3>
+                    <canvas id="incidentsSeverityChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Estado de Cambios</h3>
+                    <canvas id="changesStatusChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Riesgos por Categoría</h3>
+                    <canvas id="risksCategoryChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Estado de Hitos</h3>
+                    <canvas id="milestonesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Tab -->
+        <section class="tab-content" id="analytics">
+            <div class="section-header">
+                <h2>📈 Analytics Avanzado</h2>
+            </div>
+            
+            <div class="grid grid-2">
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Tendencia de Incidentes (Últimos 7 días)</h3>
+                    <canvas id="incidentsTrendChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Distribución de Tipos de Cambio</h3>
+                    <canvas id="changeTypesChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Matriz de Riesgos (Probabilidad vs Impacto)</h3>
+                    <canvas id="riskMatrixChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Progreso de Hitos del Proyecto</h3>
+                    <canvas id="milestonesProgressChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Tasa de Resolución de Incidentes</h3>
+                    <canvas id="resolutionRateChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Lecciones Aprendidas por Categoría PMBOK</h3>
+                    <canvas id="lessonsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Base de Conocimientos Tab -->
+        <section class="tab-content" id="conocimiento">
+            <div class="section-header">
+                <h2>📚 Base de Conocimientos</h2>
+            </div>
+            <div class="grid grid-3" id="knowledgeGrid"></div>
+        </section>
+
+        <!-- Reportes Tab -->
+        <section class="tab-content" id="reportes">
+            <div class="section-header">
+                <h2>📥 Exportar Reportes</h2>
+            </div>
+            
+            <div class="grid grid-3">
+                <div class="report-card">
+                    <div style="font-size: 3rem; color: #0055ff; margin-bottom: 1rem;">📄</div>
+                    <h3>Exportar Datos (JSON)</h3>
+                    <p style="color: #6c757d; margin: 1rem 0;">Descarga todos los datos del proyecto en formato JSON</p>
+                    <button class="btn btn-primary" id="btnExportJSON">📥 Descargar JSON</button>
+                </div>
+
+                <div class="report-card">
+                    <div style="font-size: 3rem; color: #28a745; margin-bottom: 1rem;">💾</div>
+                    <h3>Cargar Datos de Ejemplo</h3>
+                    <p style="color: #6c757d; margin: 1rem 0;">Carga 20 registros iniciales para comenzar</p>
+                    <button class="btn btn-success" id="btnLoadSample">▶️ Cargar Datos</button>
+                </div>
+
+                <div class="report-card">
+                    <div style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;">🗑️</div>
+                    <h3>Limpiar Todos los Datos</h3>
+                    <p style="color: #6c757d; margin: 1rem 0;">Elimina todos los registros (irreversible)</p>
+                    <button class="btn btn-danger" id="btnClearAll">⚠️ Limpiar Todo</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Detalle de Riesgo -->
+    <div class="modal" id="riskDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="display: flex; align-items: center; gap: 0.5rem;">⚠️ Detalle del Riesgo</h2>
+                <button class="modal-close" id="btnCloseModal">×</button>
+            </div>
+            <div class="modal-body" id="riskDetailBody"></div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Variables globales
+        let simulationActive = true;
+        let projectDay = 1;
+        let simulationInterval = null;
+        let dayInterval = null;
+        let simulationSpeed = 5000;
+        let activityLog = [];
+        let allData = {
+            incidentes: [],
+            problemas: [],
+            cambios: [],
+            riesgos: [],
+            hitos: [],
+            lecciones: [],
+            conocimientos: []
+        };
+
+        // Datos de ejemplo
+        const sampleIncidents = [
+            "Caída del servicio de predicción de fraude en producción",
+            "Falsos positivos elevados (15%) en transacciones internacionales",
+            "Tiempo de respuesta del modelo > 3 segundos (SLA: 1s)",
+            "Error en la integración con API del core bancario",
+            "Alertas duplicadas enviadas a clientes legítimos",
+            "Degradación del rendimiento en horario pico",
+            "Fallo en el servicio de autenticación biométrica",
+            "Inconsistencia en datos entre staging y producción",
+            "Memory leak detectado en servidor de inferencia",
+            "Timeout en conexiones con base de datos de transacciones"
+        ];
+
+        const sampleProblems = [
+            "Degradación progresiva del modelo por data drift",
+            "Sesgo algorítmico detectado en transacciones de bajo monto",
+            "Falta de datos etiquetados para reentrenamiento",
+            "Inconsistencia en features entre entrenamiento y producción",
+            "Memoria insuficiente en servidores de inferencia",
+            "Latencia elevada en consultas a base de datos histórica",
+            "Configuración incorrecta del balanceador de carga",
+            "Fuga de memoria en módulo de preprocesamiento"
+        ];
+
+        const sampleChanges = [
+            "Actualización del modelo de Random Forest v2.3 a v2.4",
+            "Implementación de nuevo threshold de scoring (0.7 a 0.65)",
+            "Migración de base de datos PostgreSQL 12 a 14",
+            "Despliegue de dashboard de monitoreo en tiempo real",
+            "Actualización de bibliotecas de seguridad críticas",
+            "Cambio en arquitectura de microservicios",
+            "Implementación de cache distribuido Redis",
+            "Upgrade de Kubernetes a versión 1.28"
+        ];
+
+        const sampleRisks = [
+            "Regulación bancaria podría exigir explicabilidad total del modelo",
+            "Fuga de talento clave (Data Scientists) a competidores",
+            "Ciberataque tipo adversarial attack al modelo de ML",
+            "Incompatibilidad con sistemas legacy del banco",
+            "Sobrecostos por uso de infraestructura cloud",
+            "Retrasos en certificaciones de seguridad requeridas",
+            "Resistencia al cambio por parte de usuarios finales",
+            "Dependencia excesiva de proveedores cloud específicos"
+        ];
+
+        const sampleMilestones = [
+            "Aprobación del comité ejecutivo para inicio del proyecto",
+            "Finalización de la fase de entrenamiento del modelo",
+            "Certificación PCI DSS del ambiente productivo",
+            "Go-live en producción con 10% del tráfico",
+            "Completar integración con sistema core bancario",
+            "Aprobación de auditoría de seguridad externa",
+            "Capacitación completa de usuarios finales",
+            "Documentación técnica y operativa finalizada"
+        ];
+
+        const sampleLessons = [
+            "Validar calidad de datos ANTES de entrenar modelos",
+            "Incluir al área legal desde la fase de diseño",
+            "Realizar pruebas de carga con 3x el tráfico esperado",
+            "Documentar todas las decisiones del CAB",
+            "Establecer métricas de negocio claras desde el inicio",
+            "Involucrar a usuarios finales en pruebas tempranas",
+            "Mantener ambiente de staging idéntico a producción",
+            "Implementar rollback automático ante fallos críticos"
+        ];
+
+        const sampleKnowledge = [
+            {
+                title: "Cómo interpretar métricas de un modelo de fraude",
+                content: "Precision, Recall, F1-Score y AUC-ROC son métricas clave. En detección de fraudes, preferimos Recall alto para no perder fraudes reales.",
+                category: "Machine Learning"
+            },
+            {
+                title: "Proceso de gestión de incidentes en servicios de IA",
+                content: "1) Detección automática, 2) Clasificación por severidad, 3) Escalamiento al equipo ML, 4) Análisis de impacto, 5) Resolución y documentación.",
+                category: "ITIL 4"
+            },
+            {
+                title: "Mitigación de sesgo algorítmico",
+                content: "Aplicar técnicas de fairness, auditar con datasets diversos, implementar monitoring continuo de métricas de equidad.",
+                category: "IA Ética"
+            },
+            {
+                title: "Best practices para entrenar modelos de ML",
+                content: "Validación cruzada, separación correcta train/test, análisis de curvas de aprendizaje, monitoreo de overfitting.",
+                category: "Machine Learning"
+            }
+        ];
+
+        const responsables = [
+            "Juan Pérez - Data Scientist",
+            "María García - DevOps Engineer",
+            "Carlos López - ML Engineer",
+            "Ana Martínez - QA Analyst",
+            "Pedro Sánchez - Gestor de Cambios",
+            "Laura Torres - Analista de Riesgos",
+            "Miguel Ángel - Arquitecto",
+            "Sofia Ramírez - Product Owner"
+        ];
+
+        const pmbokAreas = [
+            "Alcance", "Cronograma", "Costos", "Calidad", "Recursos",
+            "Comunicaciones", "Riesgos", "Adquisiciones", "Interesados"
+        ];
+
+        // Funciones auxiliares
+        function generateId(prefix) {
+            return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatTime(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        function random(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'error' ? '❌' : 'ℹ️';
+            toast.innerHTML = `<span style="font-size: 1.5rem;">${icon}</span><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function addActivity(message, type) {
+            const now = new Date();
+            const activity = {
+                message,
+                type,
+                time: formatTime(now),
+                date: formatDate(now)
+            };
+            activityLog.unshift(activity);
+            if (activityLog.length > 10) activityLog.pop();
+            renderActivityFeed();
+        }
+
+        function renderActivityFeed() {
+            const feed = document.getElementById('activityFeed');
+            if (!feed) return;
+            
+            feed.innerHTML = '';
+            activityLog.forEach(activity => {
+                const item = document.createElement('div');
+                item.className = 'activity-item';
+                const icon = activity.type === 'incidente' ? '🎫' : activity.type === 'problema' ? '🔧' : 
+                             activity.type === 'cambio' ? '🔄' : activity.type === 'riesgo' ? '⚠️' :
+                             activity.type === 'hito' ? '🏁' : activity.type === 'leccion' ? '💡' : '📚';
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="display: flex; gap: 0.5rem;">
+                            <span>${icon}</span>
+                            <span>${activity.message}</span>
+                        </div>
+                        <span class="activity-time">${activity.time}</span>
+                    </div>
+                `;
+                feed.appendChild(item);
+            });
+        }
+
+        // Crear registro aleatorio
+        function createRandomRecord(type) {
+            const today = new Date();
+            const randomDays = Math.floor(Math.random() * 30);
+            const date = new Date(today.getTime() + randomDays * 24 * 60 * 60 * 1000);
+            
+            switch(type) {
+                case 'incidente':
+                    return {
+                        id: generateId('INC'),
+                        fecha: formatDate(date),
+                        descripcion: random(sampleIncidents),
+                        severidad: random(['Crítica', 'Alta', 'Media', 'Baja']),
+                        responsable: random(responsables),
+                        estado: random(['Abierto', 'En Progreso', 'Resuelto'])
+                    };
+                
+                case 'problema':
+                    return {
+                        id: generateId('PRB'),
+                        fecha: formatDate(date),
+                        descripcion: random(sampleProblems),
+                        causaRaiz: 'Análisis en progreso mediante técnica 5 Whys',
+                        responsable: random(responsables),
+                        estado: random(['Abierto', 'En Análisis', 'Resuelto'])
+                    };
+                
+                case 'cambio':
+                    return {
+                        id: generateId('CHG'),
+                        fecha: formatDate(date),
+                        descripcion: random(sampleChanges),
+                        tipo: random(['Normal', 'Estándar', 'Emergencia']),
+                        impacto: random(['Alto', 'Medio', 'Bajo']),
+                        estado: random(['Pendiente', 'Aprobado', 'Rechazado', 'Implementado'])
+                    };
+                
+                case 'riesgo':
+                    return {
+                        id: generateId('RSK'),
+                        fecha: formatDate(date),
+                        descripcion: random(sampleRisks),
+                        probabilidad: random(['Alta', 'Media', 'Baja']),
+                        impacto: random(['Alto', 'Medio', 'Bajo']),
+                        mitigacion: 'Plan de mitigación definido y en seguimiento',
+                        responsableRiesgo: random(responsables),
+                        categoria: random(['Técnico', 'Financiero', 'Operacional', 'Legal']),
+                        estado: random(['Activo', 'Mitigado', 'Cerrado'])
+                    };
+                
+                case 'hito':
+                    return {
+                        id: generateId('MLT'),
+                        fechaPlanificada: formatDate(date),
+                        descripcion: random(sampleMilestones),
+                        entregable: 'Documento técnico y presentación ejecutiva',
+                        responsable: random(responsables),
+                        estado: random(['Pendiente', 'En Progreso', 'Completado']),
+                        progreso: Math.floor(Math.random() * 100)
+                    };
+                
+                case 'leccion':
+                    return {
+                        id: generateId('LCN'),
+                        fecha: formatDate(date),
+                        situacion: 'Experiencia durante fase de ' + random(['desarrollo', 'testing', 'despliegue']),
+                        leccion: random(sampleLessons),
+                        categoria: random(pmbokAreas),
+                        impacto: random(['Positivo', 'Negativo', 'Neutral'])
+                    };
+                
+                case 'conocimiento':
+                    const kb = random(sampleKnowledge);
+                    return {
+                        id: generateId('KB'),
+                        fecha: formatDate(date),
+                        titulo: kb.title,
+                        contenido: kb.content,
+                        categoria: kb.category,
+                        autor: random(responsables)
+                    };
+            }
+        }
+
+        // Generar registro aleatorio
+        function generateRandomRecord() {
+            const types = ['incidente', 'problema', 'cambio', 'riesgo', 'hito', 'leccion', 'conocimiento'];
+            const randomType = random(types);
+            const record = createRandomRecord(randomType);
+            
+            if (record) {
+                const key = randomType + 's';
+                allData[key].push(record);
+                renderTable(key);
+                updateCharts();
+                updateMetrics();
+                updateProgress();
+                updateStats();
+                addActivity(`Nuevo ${randomType} generado: ${record.descripcion || record.titulo || record.situacion}`, randomType);
+                showToast(`Nuevo ${randomType} generado`, 'success');
+            }
+        }
+
+        // Eliminar registro
+        function deleteRecord(type, id) {
+            const key = type + 's';
+            allData[key] = allData[key].filter(item => item.id !== id);
+            renderTable(key);
+            updateCharts();
+            updateMetrics();
+            updateProgress();
+            updateStats();
+            addActivity(`${type} eliminado: ${id}`, type);
+            showToast('Registro eliminado', 'warning');
+        }
+
+        // Actualizar estadísticas del inicio
+        function updateStats() {
+            document.getElementById('totalIncidents').textContent = allData.incidentes.length;
+            document.getElementById('resolvedIncidents').textContent = 
+                allData.incidentes.filter(i => i.estado === 'Resuelto').length;
+            document.getElementById('totalRisks').textContent = 
+                allData.riesgos.filter(r => r.estado === 'Activo').length;
+            document.getElementById('criticalAlerts').textContent = 
+                allData.incidentes.filter(i => i.severidad === 'Crítica' && i.estado !== 'Resuelto').length;
+            
+            document.getElementById('totalRecords').textContent = 
+                Object.values(allData).reduce((acc, arr) => acc + arr.length, 0);
+            
+            // Calcular tendencias
+            const totalInc = allData.incidentes.length;
+            document.getElementById('incidentsTrend').innerHTML = 
+                totalInc > 0 ? `↗ +${Math.floor(Math.random() * 15)}% esta semana` : '→ Sin datos';
+            
+            const resolved = allData.incidentes.filter(i => i.estado === 'Resuelto').length;
+            document.getElementById('resolvedTrend').innerHTML = 
+                resolved > 0 ? `↗ +${Math.floor(Math.random() * 20)}%` : '→ Sin datos';
+        }
+
+        // Renderizar tablas
+        function renderTable(type) {
+            const tbody = document.getElementById(type + 'Body');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            const data = allData[type] || [];
+            
+            data.forEach(item => {
+                const row = tbody.insertRow();
+                
+                switch(type) {
+                    case 'incidentes':
+                        row.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.fecha}</td>
+                            <td>${item.descripcion}</td>
+                            <td><span class="badge badge-${getSeverityClass(item.severidad)}">${item.severidad}</span></td>
+                            <td>${item.responsable}</td>
+                            <td><span class="badge badge-${getStatusClass(item.estado)}">${item.estado}</span></td>
+                            <td><button class="btn btn-danger btn-small" data-type="incidente" data-id="${item.id}">🗑️</button></td>
+                        `;
+                        break;
+                    
+                    case 'problemas':
+                        row.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.fecha}</td>
+                            <td>${item.descripcion}</td>
+                            <td>${item.causaRaiz}</td>
+                            <td>${item.responsable}</td>
+                            <td><span class="badge badge-${getStatusClass(item.estado)}">${item.estado}</span></td>
+                            <td><button class="btn btn-danger btn-small" data-type="problema" data-id="${item.id}">🗑️</button></td>
+                        `;
+                        break;
+                    
+                    case 'cambios':
+                        row.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.fecha}</td>
+                            <td>${item.descripcion}</td>
+                            <td><span class="badge badge-info">${item.tipo}</span></td>
+                            <td><span class="badge badge-${getImpactClass(item.impacto)}">${item.impacto}</span></td>
+                            <td><span class="badge badge-${getChangeStatusClass(item.estado)}">${item.estado}</span></td>
+                            <td><button class="btn btn-danger btn-small" data-type="cambio" data-id="${item.id}">🗑️</button></td>
+                        `;
+                        break;
+                    
+                    case 'riesgos':
+                        row.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.fecha}</td>
+                            <td>${item.descripcion}</td>
+                            <td><span class="badge badge-${getProbClass(item.probabilidad)}">${item.probabilidad}</span></td>
+                            <td><span class="badge badge-${getImpactClass(item.impacto)}">${item.impacto}</span></td>
+                            <td>${item.mitigacion.substring(0, 40)}...</td>
+                            <td>
+                                <button class="btn btn-primary btn-small" data-action="view-risk" data-risk-id="${item.id}">👁️</button>
+                                <button class="btn btn-danger btn-small" data-type="riesgo" data-id="${item.id}">🗑️</button>
+                            </td>
+                        `;
+                        break;
+                    
+                    case 'hitos':
+                        row.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.fechaPlanificada}</td>
+                            <td>${item.descripcion}</td>
+                            <td>${item.entregable}</td>
+                            <td>${item.responsable}</td>
+                            <td><span class="badge badge-${getStatusClass(item.estado)}">${item.estado}</span></td>
+                            <td><button class="btn btn-danger btn-small" data-type="hito" data-id="${item.id}">🗑️</button></td>
+                        `;
+                        break;
+                    
+                    case 'lecciones':
+                        row.innerHTML = `
+                            <td>${item.id}</td>
+                            <td>${item.fecha}</td>
+                            <td>${item.situacion}</td>
+                            <td>${item.leccion}</td>
+                            <td><span class="badge badge-primary">${item.categoria}</span></td>
+                            <td><button class="btn btn-danger btn-small" data-type="leccion" data-id="${item.id}">🗑️</button></td>
+                        `;
+                        break;
+                }
+            });
+            
+            // Agregar event listeners a los botones de eliminar
+            tbody.querySelectorAll('[data-type][data-id]').forEach(btn => {
+                if (!btn.hasAttribute('data-action')) {
+                    btn.addEventListener('click', function() {
+                        deleteRecord(this.dataset.type, this.dataset.id);
+                    });
+                }
+            });
+            
+            // Agregar event listeners a los botones de ver riesgo
+            tbody.querySelectorAll('[data-action="view-risk"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const riskId = this.dataset.riskId;
+                    const risk = allData.riesgos.find(r => r.id === riskId);
+                    if (risk) {
+                        showRiskDetail(risk);
+                    }
+                });
+            });
+        }
+
+        // Renderizar base de conocimientos
+        function renderKnowledge() {
+            const container = document.getElementById('knowledgeGrid');
+            container.innerHTML = '';
+            
+            allData.conocimientos.forEach(kb => {
+                const card = document.createElement('div');
+                card.className = 'knowledge-card';
+                card.innerHTML = `
+                    <h3>${kb.titulo}</h3>
+                    <p style="color: #6c757d; margin: 1rem 0;">${kb.contenido}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid #dee2e6;">
+                        <span class="badge badge-primary">${kb.categoria}</span>
+                        <span style="font-size: 0.75rem; color: #6c757d;">${kb.autor}</span>
+                    </div>
+                    <button class="btn btn-danger btn-small" style="margin-top: 1rem;" data-type="conocimiento" data-id="${kb.id}">🗑️ Eliminar</button>
+                `;
+                container.appendChild(card);
+                
+                card.querySelector('[data-type][data-id]').addEventListener('click', function() {
+                    deleteRecord(this.dataset.type, this.dataset.id);
+                });
+            });
+        }
+
+        // Clases de estilo
+        function getSeverityClass(severity) {
+            const map = { 'Crítica': 'danger', 'Alta': 'danger', 'Media': 'warning', 'Baja': 'info' };
+            return map[severity] || 'info';
+        }
+
+        function getStatusClass(status) {
+            const map = { 
+                'Resuelto': 'success', 'Completado': 'success', 'Mitigado': 'success', 'Cerrado': 'success',
+                'En Progreso': 'warning', 'En Análisis': 'warning',
+                'Abierto': 'danger', 'Activo': 'danger', 'Pendiente': 'info'
+            };
+            return map[status] || 'info';
+        }
+
+        function getChangeStatusClass(status) {
+            const map = { 'Implementado': 'success', 'Aprobado': 'primary', 'Pendiente': 'warning', 'Rechazado': 'danger' };
+            return map[status] || 'info';
+        }
+
+        function getImpactClass(impact) {
+            const map = { 'Alto': 'danger', 'Medio': 'warning', 'Bajo': 'success' };
+            return map[impact] || 'info';
+        }
+
+        function getProbClass(prob) {
+            const map = { 'Alta': 'danger', 'Media': 'warning', 'Baja': 'success' };
+            return map[prob] || 'info';
+        }
+
+        // Modal de detalle de riesgo
+        function showRiskDetail(risk) {
+            const modal = document.getElementById('riskDetailModal');
+            const body = document.getElementById('riskDetailBody');
+            
+            const severity = calculateRiskSeverity(risk.probabilidad, risk.impacto);
+            
+            body.innerHTML = `
+                <div class="risk-info-item">
+                    <h4>ID del Riesgo</h4>
+                    <p>${risk.id}</p>
+                </div>
+                <div class="risk-info-item">
+                    <h4>Fecha de Identificación</h4>
+                    <p>${risk.fecha}</p>
+                </div>
+                <div class="risk-info-item">
+                    <h4>Descripción Completa</h4>
+                    <p>${risk.descripcion}</p>
+                </div>
+                <div class="risk-info-item">
+                    <h4>Nivel de Severidad</h4>
+                    <span class="badge badge-${severity.class}">${severity.label}</span>
+                </div>
+                <div class="risk-info-item">
+                    <h4>Probabilidad de Ocurrencia</h4>
+                    <span class="badge badge-${getProbClass(risk.probabilidad)}">${risk.probabilidad}</span>
+                </div>
+                <div class="risk-info-item">
+                    <h4>Impacto en el Proyecto</h4>
+                    <span class="badge badge-${getImpactClass(risk.impacto)}">${risk.impacto}</span>
+                </div>
+                <div class="risk-info-item">
+                    <h4>Plan de Mitigación</h4>
+                    <p>${risk.mitigacion}</p>
+                </div>
+                ${risk.responsableRiesgo ? `
+                <div class="risk-info-item">
+                    <h4>Responsable</h4>
+                    <p>${risk.responsableRiesgo}</p>
+                </div>` : ''}
+                ${risk.categoria ? `
+                <div class="risk-info-item">
+                    <h4>Categoría</h4>
+                    <span class="badge badge-info">${risk.categoria}</span>
+                </div>` : ''}
+                ${risk.estado ? `
+                <div class="risk-info-item">
+                    <h4>Estado Actual</h4>
+                    <span class="badge badge-${getStatusClass(risk.estado)}">${risk.estado}</span>
+                </div>` : ''}
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        function closeRiskDetail() {
+            document.getElementById('riskDetailModal').classList.remove('active');
+        }
+
+        function calculateRiskSeverity(prob, impact) {
+            const probValue = prob === 'Alta' ? 3 : prob === 'Media' ? 2 : 1;
+            const impactValue = impact === 'Alto' ? 3 : impact === 'Medio' ? 2 : 1;
+            const total = probValue * impactValue;
+            
+            if (total >= 6) return { label: 'Severidad Crítica', class: 'danger' };
+            if (total >= 3) return { label: 'Severidad Media', class: 'warning' };
+            return { label: 'Severidad Baja', class: 'success' };
+        }
+
+        // Actualizar métricas
+        function updateMetrics() {
+            const incidents = allData.incidentes || [];
+            const total = incidents.length;
+            
+            document.getElementById('avgResolutionTime').textContent = 
+                total > 0 ? `${(2 + Math.random() * 2).toFixed(1)} horas` : '0 horas';
+            
+            document.getElementById('firstContactResolution').textContent = 
+                total > 0 ? `${Math.floor(70 + Math.random() * 20)}%` : '0%';
+            
+            document.getElementById('userSatisfaction').textContent = 
+                total > 0 ? `${(4.2 + Math.random() * 0.8).toFixed(1)}/5.0` : '0/5.0';
+            
+            document.getElementById('activeIncidents').textContent = 
+                incidents.filter(i => i.estado !== 'Resuelto').length;
+        }
+
+        // Actualizar progreso
+        function updateProgress() {
+            const milestones = allData.hitos || [];
+            const completed = milestones.filter(h => h.estado === 'Completado').length;
+            const total = milestones.length;
+            
+            const percentage = total > 0 ? Math.floor((completed / total) * 100) : 0;
+            const progressBar = document.getElementById('projectProgress');
+            
+            progressBar.style.width = percentage + '%';
+            progressBar.querySelector('.progress-text').textContent = percentage + '%';
+        }
+
+        // Gráficos
+        let charts = {};
+
+        function initCharts() {
+            // Gráfico 1: Incidentes por Severidad
+            const ctx1 = document.getElementById('incidentsSeverityChart');
+            if (ctx1) {
+                charts.severity = new Chart(ctx1.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Crítica', 'Alta', 'Media', 'Baja'],
+                        datasets: [{
+                            label: 'Cantidad',
+                            data: [0, 0, 0, 0],
+                            backgroundColor: ['#dc3545', '#ff6384', '#ffc107', '#17a2b8']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+            // Gráfico 2: Estado de Cambios
+            const ctx2 = document.getElementById('changesStatusChart');
+            if (ctx2) {
+                charts.changes = new Chart(ctx2.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Pendiente', 'Aprobado', 'Rechazado', 'Implementado'],
+                        datasets: [{
+                            data: [0, 0, 0, 0],
+                            backgroundColor: ['#ffc107', '#0055ff', '#dc3545', '#28a745']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true
+                    }
+                });
+            }
+
+            // Gráfico 3: Riesgos por Categoría
+            const ctx3 = document.getElementById('risksCategoryChart');
+            if (ctx3) {
+                charts.risksCategory = new Chart(ctx3.getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Técnico', 'Financiero', 'Operacional', 'Legal'],
+                        datasets: [{
+                            data: [0, 0, 0, 0],
+                            backgroundColor: ['#0055ff', '#28a745', '#ffc107', '#dc3545']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true
+                    }
+                });
+            }
+
+            // Gráfico 4: Hitos
+            const ctx4 = document.getElementById('milestonesChart');
+            if (ctx4) {
+                charts.milestones = new Chart(ctx4.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Pendiente', 'En Progreso', 'Completado'],
+                        datasets: [{
+                            label: 'Hitos',
+                            data: [0, 0, 0],
+                            backgroundColor: ['#ffc107', '#0055ff', '#28a745']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+            // Gráfico 5: Tendencia de Incidentes
+            const ctx5 = document.getElementById('incidentsTrendChart');
+            if (ctx5) {
+                charts.incidentsTrend = new Chart(ctx5.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5', 'Día 6', 'Día 7'],
+                        datasets: [{
+                            label: 'Incidentes',
+                            data: [0, 0, 0, 0, 0, 0, 0],
+                            borderColor: '#0055ff',
+                            backgroundColor: 'rgba(0, 85, 255, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true
+                    }
+                });
+            }
+
+            // Gráfico 6: Tipos de Cambio
+            const ctx6 = document.getElementById('changeTypesChart');
+            if (ctx6) {
+                charts.changeTypes = new Chart(ctx6.getContext('2d'), {
+                    type: 'polarArea',
+                    data: {
+                        labels: ['Normal', 'Estándar', 'Emergencia'],
+                        datasets: [{
+                            data: [0, 0, 0],
+                            backgroundColor: ['#0055ff', '#28a745', '#dc3545']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true
+                    }
+                });
+            }
+
+            // Gráfico 7: Matriz de Riesgos
+            const ctx7 = document.getElementById('riskMatrixChart');
+            if (ctx7) {
+                charts.riskMatrix = new Chart(ctx7.getContext('2d'), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Riesgos',
+                            data: [],
+                            backgroundColor: '#dc3545'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            x: { title: { display: true, text: 'Probabilidad' }, min: 0, max: 3 },
+                            y: { title: { display: true, text: 'Impacto' }, min: 0, max: 3 }
+                        }
+                    }
+                });
+            }
+
+            // Gráfico 8: Progreso de Hitos
+            const ctx8 = document.getElementById('milestonesProgressChart');
+            if (ctx8) {
+                charts.milestonesProgress = new Chart(ctx8.getContext('2d'), {
+                    type: 'radar',
+                    data: {
+                        labels: ['Planificación', 'Ejecución', 'Monitoreo', 'Cierre'],
+                        datasets: [{
+                            label: 'Progreso',
+                            data: [0, 0, 0, 0],
+                            backgroundColor: 'rgba(0, 85, 255, 0.2)',
+                            borderColor: '#0055ff',
+                            pointBackgroundColor: '#0055ff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true
+                    }
+                });
+            }
+
+            // Gráfico 9: Tasa de Resolución
+            const ctx9 = document.getElementById('resolutionRateChart');
+            if (ctx9) {
+                charts.resolutionRate = new Chart(ctx9.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+                        datasets: [{
+                            label: 'Tasa de Resolución (%)',
+                            data: [65, 72, 78, 85],
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true
+                    }
+                });
+            }
+
+            // Gráfico 10: Lecciones por Categoría
+            const ctx10 = document.getElementById('lessonsChart');
+            if (ctx10) {
+                charts.lessons = new Chart(ctx10.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: pmbokAreas,
+                        datasets: [{
+                            label: 'Lecciones Aprendidas',
+                            data: new Array(pmbokAreas.length).fill(0),
+                            backgroundColor: '#0055ff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        indexAxis: 'y',
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        }
+
+        function updateCharts() {
+            // Actualizar gráfico de severidad
+            if (charts.severity) {
+                const data = [0, 0, 0, 0];
+                (allData.incidentes || []).forEach(inc => {
+                    switch(inc.severidad) {
+                        case 'Crítica': data[0]++; break;
+                        case 'Alta': data[1]++; break;
+                        case 'Media': data[2]++; break;
+                        case 'Baja': data[3]++; break;
+                    }
+                });
+                charts.severity.data.datasets[0].data = data;
+                charts.severity.update();
+            }
+
+            // Actualizar gráfico de cambios
+            if (charts.changes) {
+                const data = [0, 0, 0, 0];
+                (allData.cambios || []).forEach(chg => {
+                    switch(chg.estado) {
+                        case 'Pendiente': data[0]++; break;
+                        case 'Aprobado': data[1]++; break;
+                        case 'Rechazado': data[2]++; break;
+                        case 'Implementado': data[3]++; break;
+                    }
+                });
+                charts.changes.data.datasets[0].data = data;
+                charts.changes.update();
+            }
+
+            // Actualizar gráfico de riesgos por categoría
+            if (charts.risksCategory) {
+                const data = [0, 0, 0, 0];
+                (allData.riesgos || []).forEach(risk => {
+                    switch(risk.categoria) {
+                        case 'Técnico': data[0]++; break;
+                        case 'Financiero': data[1]++; break;
+                        case 'Operacional': data[2]++; break;
+                        case 'Legal': data[3]++; break;
+                    }
+                });
+                charts.risksCategory.data.datasets[0].data = data;
+                charts.risksCategory.update();
+            }
+
+            // Actualizar gráfico de hitos
+            if (charts.milestones) {
+                const data = [0, 0, 0];
+                (allData.hitos || []).forEach(milestone => {
+                    switch(milestone.estado) {
+                        case 'Pendiente': data[0]++; break;
+                        case 'En Progreso': data[1]++; break;
+                        case 'Completado': data[2]++; break;
+                    }
+                });
+                charts.milestones.data.datasets[0].data = data;
+                charts.milestones.update();
+            }
+
+            // Actualizar tendencia de incidentes
+            if (charts.incidentsTrend) {
+                const currentData = charts.incidentsTrend.data.datasets[0].data;
+                currentData.shift();
+                currentData.push(allData.incidentes.length);
+                charts.incidentsTrend.update();
+            }
+
+            // Actualizar tipos de cambio
+            if (charts.changeTypes) {
+                const data = [0, 0, 0];
+                (allData.cambios || []).forEach(chg => {
+                    switch(chg.tipo) {
+                        case 'Normal': data[0]++; break;
+                        case 'Estándar': data[1]++; break;
+                        case 'Emergencia': data[2]++; break;
+                    }
+                });
+                charts.changeTypes.data.datasets[0].data = data;
+                charts.changeTypes.update();
+            }
+
+            // Actualizar matriz de riesgos
+            if (charts.riskMatrix) {
+                const scatterData = (allData.riesgos || []).map(risk => {
+                    const prob = risk.probabilidad === 'Alta' ? 3 : risk.probabilidad === 'Media' ? 2 : 1;
+                    const imp = risk.impacto === 'Alto' ? 3 : risk.impacto === 'Medio' ? 2 : 1;
+                    return { x: prob, y: imp };
+                });
+                charts.riskMatrix.data.datasets[0].data = scatterData;
+                charts.riskMatrix.update();
+            }
+
+            // Actualizar progreso de hitos
+            if (charts.milestonesProgress) {
+                const progress = [
+                    Math.floor(Math.random() * 100),
+                    Math.floor(Math.random() * 100),
+                    Math.floor(Math.random() * 100),
+                    Math.floor(Math.random() * 100)
+                ];
+                charts.milestonesProgress.data.datasets[0].data = progress;
+                charts.milestonesProgress.update();
+            }
+
+            // Actualizar lecciones aprendidas
+            if (charts.lessons) {
+                const data = new Array(pmbokAreas.length).fill(0);
+                (allData.lecciones || []).forEach(lesson => {
+                    const index = pmbokAreas.indexOf(lesson.categoria);
+                    if (index !== -1) data[index]++;
+                });
+                charts.lessons.data.datasets[0].data = data;
+                charts.lessons.update();
+            }
+        }
+
+        // Cargar datos de ejemplo
+        function loadSampleData() {
+            if (!confirm('¿Desea cargar los datos de ejemplo? Esto agregará 20 registros nuevos.')) {
+                return;
+            }
+            
+            for (let i = 0; i < 20; i++) {
+                const types = ['incidente', 'problema', 'cambio', 'riesgo', 'hito', 'leccion'];
+                const type = types[i % types.length];
+                const record = createRandomRecord(type);
+                allData[type + 's'].push(record);
+            }
+            
+            renderAllTables();
+            updateCharts();
+            updateMetrics();
+            updateProgress();
+            updateStats();
+            showToast('20 registros de ejemplo cargados exitosamente', 'success');
+        }
+
+        // Limpiar datos
+        function clearAllData() {
+            if (!confirm('¿Está seguro de eliminar TODOS los datos? Esta acción no se puede deshacer.')) {
+                return;
+            }
+            
+            allData = {
+                incidentes: [],
+                problemas: [],
+                cambios: [],
+                riesgos: [],
+                hitos: [],
+                lecciones: [],
+                conocimientos: []
+            };
+            
+            projectDay = 1;
+            activityLog = [];
+            document.getElementById('projectDay').textContent = '1';
+            
+            renderAllTables();
+            updateCharts();
+            updateMetrics();
+            updateProgress();
+            updateStats();
+            renderActivityFeed();
+            showToast('Todos los datos han sido eliminados', 'warning');
+        }
+
+        // Exportar JSON
+        function exportJSON() {
+            const dataStr = JSON.stringify(allData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fraud-detection-data-${Date.now()}.json`;
+            a.click();
+            showToast('Datos exportados exitosamente', 'success');
+        }
+
+        // Renderizar todas las tablas
+        function renderAllTables() {
+            renderTable('incidentes');
+            renderTable('problemas');
+            renderTable('cambios');
+            renderTable('riesgos');
+            renderTable('hitos');
+            renderTable('lecciones');
+            renderKnowledge();
+        }
+
+        // Cambiar velocidad de simulación
+        function changeSimulationSpeed(speed) {
+            simulationSpeed = speed;
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+                simulationInterval = setInterval(() => {
+                    if (simulationActive) {
+                        generateRandomRecord();
+                    }
+                }, simulationSpeed);
+            }
+            document.getElementById('currentSpeed').textContent = (speed / 1000).toFixed(0);
+            showToast(`Velocidad cambiada a ${speed / 1000}s`, 'success');
+        }
+
+        // Navegación
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.sub-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const parent = tab.dataset.parent;
+                document.querySelectorAll(`[data-parent="${parent}"]`).forEach(t => t.classList.remove('active'));
+                document.querySelectorAll(`#${parent} .sub-content`).forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.subtab).classList.add('active');
+            });
+        });
+
+        // Toggle simulación
+        document.getElementById('simulationToggle').addEventListener('click', () => {
+            simulationActive = !simulationActive;
+            const btn = document.getElementById('simulationToggle');
+            const icon = document.getElementById('simIcon');
+            const text = document.getElementById('simText');
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            
+            if (simulationActive) {
+                icon.textContent = '⏸️';
+                text.textContent = 'Pausar Simulación';
+                btn.classList.remove('paused');
+                indicator.classList.remove('inactive');
+                statusText.innerHTML = `Activo - Cada <span id="currentSpeed">${simulationSpeed / 1000}</span>s`;
+            } else {
+                icon.textContent = '▶️';
+                text.textContent = 'Reanudar Simulación';
+                btn.classList.add('paused');
+                indicator.classList.add('inactive');
+                statusText.textContent = 'Simulación pausada';
+            }
+        });
+
+        // Botones de velocidad
+        document.querySelectorAll('.speed-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const speed = parseInt(this.dataset.speed);
+                changeSimulationSpeed(speed);
+            });
+        });
+
+        // Toggle tema
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.getElementById('themeToggle');
+            btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+
+        // Actualizar fecha y hora
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = 
+                now.toLocaleDateString('es-ES', options);
+        }
+
+        // Event listeners para botones
+        document.getElementById('btnCloseModal').addEventListener('click', closeRiskDetail);
+        document.getElementById('btnExportJSON').addEventListener('click', exportJSON);
+        document.getElementById('btnLoadSample').addEventListener('click', loadSampleData);
+        document.getElementById('btnClearAll').addEventListener('click', clearAllData);
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('riskDetailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'riskDetailModal') {
+                closeRiskDetail();
+            }
+        });
+
+        // Búsqueda en incidentes
+        document.getElementById('searchIncidentes').addEventListener('keyup', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#incidentesBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Inicialización
+        function init() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            
+            // Contador de días
+            dayInterval = setInterval(() => {
+                projectDay++;
+                document.getElementById('projectDay').textContent = projectDay;
+            }, 10000);
+            
+            // Simulación automática
+            simulationInterval = setInterval(() => {
+                if (simulationActive) {
+                    generateRandomRecord();
+                }
+            }, simulationSpeed);
+            
+            // Inicializar gráficos y actualizar todo
+            setTimeout(() => {
+                initCharts();
+                renderAllTables();
+                updateMetrics();
+                updateProgress();
+                updateStats();
+                renderActivityFeed();
+            }, 100);
+            
+            // Mensaje inicial
+            addActivity('Sistema iniciado correctamente', 'conocimiento');
+        }
+
+        // Ejecutar al cargar
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        console.log('🚀 Sistema de Detección de Fraudes con IA - ITIL 4 + PMBOK 7');
+        console.log('✅ Aplicación inicializada correctamente');
+        console.log('📊 Simulación automática activada');
+        console.log('⚡ Velocidad: ' + (simulationSpeed / 1000) + 's por registro');
+        console.log('📈 10 gráficos interactivos disponibles');
+    </script>
+</body>
+</html>
