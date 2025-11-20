@@ -909,8 +909,8 @@
         <button class="nav-tab active" data-tab="inicio">🏠 Inicio</button>
         <button class="nav-tab" data-tab="itil">⚙️ Gestión ITIL</button>
         <button class="nav-tab" data-tab="pmbok">📋 Gestión PMBOK</button>
-        <button class="nav-tab" data-tab="dashboard">📊 Dashboard</button>
-        <button class="nav-tab" data-tab="analytics">📈 Analytics</button>
+        <button class="nav-tab" data-tab="dashboard">📊 Panel de Control</button>
+        <button class="nav-tab" data-tab="analytics">📈 Análisis Avanzado</button>
         <button class="nav-tab" data-tab="conocimiento">📚 Base de Conocimientos</button>
         <button class="nav-tab" data-tab="reportes">📥 Reportes</button>
     </nav>
@@ -1237,7 +1237,7 @@
         <!-- Dashboard Tab -->
         <section class="tab-content" id="dashboard">
             <div class="section-header">
-                <h2>📊 Dashboard de Indicadores</h2>
+                <h2>📊 Panel de Control de Indicadores</h2>
             </div>
             
             <div class="grid grid-2">
@@ -1263,7 +1263,7 @@
         <!-- Analytics Tab -->
         <section class="tab-content" id="analytics">
             <div class="section-header">
-                <h2>📈 Analytics Avanzado</h2>
+                <h2>📈 Análisis Avanzado</h2>
             </div>
             
             <div class="grid grid-2">
@@ -1288,8 +1288,16 @@
                     <canvas id="resolutionRateChart"></canvas>
                 </div>
                 <div class="chart-container">
-                    <h3 style="margin-bottom: 1rem;">Lecciones Aprendidas por Categoría PMBOK</h3>
+                    <h3 style="margin-bottom: 1rem;">Lecciones Aprendidas por Categoría</h3>
                     <canvas id="lessonsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Evolución de Problemas en el Tiempo</h3>
+                    <canvas id="problemsEvolutionChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-bottom: 1rem;">Distribución de Severidad de Riesgos</h3>
+                    <canvas id="riskSeverityChart"></canvas>
                 </div>
             </div>
         </section>
@@ -1365,7 +1373,7 @@
             conocimientos: []
         };
 
-        // Datos de ejemplo
+        // Datos de ejemplo ampliados
         const sampleIncidents = [
             "Caída del servicio de predicción de fraude en producción",
             "Falsos positivos elevados (15%) en transacciones internacionales",
@@ -1376,7 +1384,11 @@
             "Fallo en el servicio de autenticación biométrica",
             "Inconsistencia en datos entre staging y producción",
             "Memory leak detectado en servidor de inferencia",
-            "Timeout en conexiones con base de datos de transacciones"
+            "Timeout en conexiones con base de datos de transacciones",
+            "Desbalanceo de carga en clúster de ML",
+            "Pérdida de precisión del modelo en transacciones nocturnas",
+            "Error crítico en pipeline de ETL de datos",
+            "Indisponibilidad del servicio de logs centralizado"
         ];
 
         const sampleProblems = [
@@ -1387,7 +1399,9 @@
             "Memoria insuficiente en servidores de inferencia",
             "Latencia elevada en consultas a base de datos histórica",
             "Configuración incorrecta del balanceador de carga",
-            "Fuga de memoria en módulo de preprocesamiento"
+            "Fuga de memoria en módulo de preprocesamiento",
+            "Desincronización entre réplicas de base de datos",
+            "Overfit del modelo en datos de entrenamiento recientes"
         ];
 
         const sampleChanges = [
@@ -1398,7 +1412,11 @@
             "Actualización de bibliotecas de seguridad críticas",
             "Cambio en arquitectura de microservicios",
             "Implementación de cache distribuido Redis",
-            "Upgrade de Kubernetes a versión 1.28"
+            "Upgrade de Kubernetes a versión 1.28",
+            "Migración a infraestructura serverless AWS Lambda",
+            "Implementación de modelo XGBoost como respaldo",
+            "Actualización del sistema de alertas con Machine Learning",
+            "Despliegue de nueva versión de API RESTful v3.0"
         ];
 
         const sampleRisks = [
@@ -1409,7 +1427,11 @@
             "Sobrecostos por uso de infraestructura cloud",
             "Retrasos en certificaciones de seguridad requeridas",
             "Resistencia al cambio por parte de usuarios finales",
-            "Dependencia excesiva de proveedores cloud específicos"
+            "Dependencia excesiva de proveedores cloud específicos",
+            "Multas regulatorias por falsos positivos excesivos",
+            "Pérdida de confianza del cliente por alertas erróneas",
+            "Ataque de data poisoning en datos de entrenamiento",
+            "Obsolescencia tecnológica del stack actual"
         ];
 
         const sampleMilestones = [
@@ -1420,40 +1442,104 @@
             "Completar integración con sistema core bancario",
             "Aprobación de auditoría de seguridad externa",
             "Capacitación completa de usuarios finales",
-            "Documentación técnica y operativa finalizada"
+            "Documentación técnica y operativa finalizada",
+            "Implementación completa del modelo en todos los canales",
+            "Evaluación del primer trimestre de operación"
         ];
 
         const sampleLessons = [
-            "Validar calidad de datos ANTES de entrenar modelos",
-            "Incluir al área legal desde la fase de diseño",
-            "Realizar pruebas de carga con 3x el tráfico esperado",
-            "Documentar todas las decisiones del CAB",
-            "Establecer métricas de negocio claras desde el inicio",
-            "Involucrar a usuarios finales en pruebas tempranas",
-            "Mantener ambiente de staging idéntico a producción",
-            "Implementar rollback automático ante fallos críticos"
+            "Validar calidad de datos ANTES de entrenar modelos para evitar sesgo algorítmico",
+            "Incluir al área legal desde la fase de diseño para cumplimiento regulatorio",
+            "Realizar pruebas de carga con 3x el tráfico esperado para garantizar escalabilidad",
+            "Documentar todas las decisiones del CAB para trazabilidad completa",
+            "Establecer métricas de negocio claras desde el inicio alineadas con objetivos estratégicos",
+            "Involucrar a usuarios finales en pruebas tempranas para mejor adopción",
+            "Mantener ambiente de staging idéntico a producción para evitar inconsistencias",
+            "Implementar rollback automático ante fallos críticos en menos de 5 minutos",
+            "Crear plan de contingencia para degradación del modelo ML",
+            "Establecer SLA claros con proveedores de infraestructura cloud",
+            "Implementar monitoreo continuo de métricas de fairness del modelo",
+            "Realizar análisis post-mortem después de cada incidente mayor",
+            "Mantener dataset de validación actualizado mensualmente",
+            "Establecer proceso formal de versionado de modelos ML",
+            "Crear pipeline automatizado de reentrenamiento del modelo",
+            "Implementar sistema de feature flags para despliegues graduales",
+            "Definir proceso claro de escalamiento técnico 24/7",
+            "Realizar simulacros de disaster recovery trimestralmente",
+            "Documentar casos de uso específicos de detección de fraude",
+            "Establecer canal directo de comunicación con reguladores bancarios"
         ];
 
         const sampleKnowledge = [
             {
                 title: "Cómo interpretar métricas de un modelo de fraude",
-                content: "Precision, Recall, F1-Score y AUC-ROC son métricas clave. En detección de fraudes, preferimos Recall alto para no perder fraudes reales.",
+                content: "Precision, Recall, F1-Score y AUC-ROC son métricas clave. En detección de fraudes, preferimos Recall alto para no perder fraudes reales, aunque genere más falsos positivos que luego podemos filtrar.",
                 category: "Machine Learning"
             },
             {
                 title: "Proceso de gestión de incidentes en servicios de IA",
-                content: "1) Detección automática, 2) Clasificación por severidad, 3) Escalamiento al equipo ML, 4) Análisis de impacto, 5) Resolución y documentación.",
+                content: "1) Detección automática mediante alertas, 2) Clasificación por severidad e impacto, 3) Escalamiento al equipo ML o DevOps, 4) Análisis de impacto en métricas de negocio, 5) Resolución y documentación detallada.",
                 category: "ITIL 4"
             },
             {
                 title: "Mitigación de sesgo algorítmico",
-                content: "Aplicar técnicas de fairness, auditar con datasets diversos, implementar monitoring continuo de métricas de equidad.",
+                content: "Aplicar técnicas de fairness (equidad), auditar con datasets diversos representativos, implementar monitoring continuo de métricas de equidad por segmento demográfico, y establecer umbrales de alerta.",
                 category: "IA Ética"
             },
             {
                 title: "Best practices para entrenar modelos de ML",
-                content: "Validación cruzada, separación correcta train/test, análisis de curvas de aprendizaje, monitoreo de overfitting.",
+                content: "Validación cruzada k-fold, separación correcta train/test/validation (70/15/15), análisis de curvas de aprendizaje, monitoreo de overfitting, feature engineering iterativo, y versionado de experimentos con MLflow.",
                 category: "Machine Learning"
+            },
+            {
+                title: "Arquitectura de microservicios para ML en producción",
+                content: "Separar servicios de: 1) Inferencia del modelo, 2) Pre-procesamiento de datos, 3) Post-procesamiento de resultados, 4) Monitoreo y logging, 5) Reentrenamiento automatizado. Usar contenedores Docker y orquestación con Kubernetes.",
+                category: "Arquitectura"
+            },
+            {
+                title: "Estrategias de reentrenamiento de modelos ML",
+                content: "Implementar reentrenamiento: 1) Periódico (mensual/trimestral), 2) Basado en degradación detectada (cuando métricas caen >5%), 3) Incremental con nuevos datos etiquetados. Validar siempre en dataset holdout antes de desplegar.",
+                category: "MLOps"
+            },
+            {
+                title: "Gestión de cambios en modelos de Machine Learning",
+                content: "Todo cambio de modelo debe pasar por CAB: evaluar impacto en métricas de negocio, realizar pruebas A/B con tráfico limitado, documentar cambios en features o hiperparámetros, y mantener versión anterior lista para rollback.",
+                category: "ITIL 4"
+            },
+            {
+                title: "Técnicas de explicabilidad de modelos (XAI)",
+                content: "Usar SHAP values para explicar predicciones individuales, LIME para análisis local, feature importance global, y curvas de dependencia parcial. Fundamental para auditorías regulatorias y confianza de usuarios.",
+                category: "IA Explicable"
+            },
+            {
+                title: "Monitoreo de data drift en producción",
+                content: "Implementar alertas cuando la distribución de features en producción difiere significativamente del entrenamiento. Usar métricas como KL divergence, PSI (Population Stability Index) y monitorear distribución de scores predichos.",
+                category: "MLOps"
+            },
+            {
+                title: "Cumplimiento regulatorio en sistemas de IA bancaria",
+                content: "Asegurar: 1) Explicabilidad de decisiones automatizadas, 2) Auditoría completa de cambios, 3) Protección de datos personales (GDPR), 4) Evaluación de impacto de algoritmos, 5) Documentación de sesgo y fairness, 6) Plan de gobierno de IA.",
+                category: "Cumplimiento"
+            },
+            {
+                title: "Estrategia de testing para sistemas ML",
+                content: "Implementar: 1) Unit tests para código, 2) Integration tests para pipelines, 3) Data validation tests, 4) Model performance tests en datasets de validación, 5) Shadow mode testing en producción, 6) Canary deployments progresivos.",
+                category: "Testing"
+            },
+            {
+                title: "Gestión de la capacidad en infraestructura ML",
+                content: "Planificar escalamiento basado en: volumen de transacciones esperado, latencia máxima aceptable (SLA), recursos de GPU/CPU necesarios, almacenamiento de modelos y datos. Implementar auto-scaling dinámico y monitoreo de utilización.",
+                category: "Gestión de Capacidad"
+            },
+            {
+                title: "Plan de continuidad de negocio para servicios IA",
+                content: "Establecer: 1) Modelo fallback simple (reglas de negocio), 2) Réplicas en múltiples zonas de disponibilidad, 3) Backup automático de modelos y datos, 4) Procedimiento de recuperación documentado, 5) RTO y RPO definidos claramente.",
+                category: "Continuidad"
+            },
+            {
+                title: "Gestión de stakeholders en proyectos de IA",
+                content: "Comunicar regularmente con: ejecutivos (métricas de negocio), áreas técnicas (arquitectura y rendimiento), compliance (riesgos regulatorios), usuarios finales (usabilidad). Adaptar lenguaje a cada audiencia y mantener transparencia.",
+                category: "PMBOK 7"
             }
         ];
 
@@ -1464,8 +1550,12 @@
             "Ana Martínez - QA Analyst",
             "Pedro Sánchez - Gestor de Cambios",
             "Laura Torres - Analista de Riesgos",
-            "Miguel Ángel - Arquitecto",
-            "Sofia Ramírez - Product Owner"
+            "Miguel Ángel - Arquitecto de Soluciones",
+            "Sofia Ramírez - Product Owner",
+            "Roberto Díaz - Ingeniero de Datos",
+            "Carmen Ruiz - Especialista en Seguridad",
+            "Fernando Castro - MLOps Engineer",
+            "Patricia Morales - Analista de Cumplimiento"
         ];
 
         const pmbokAreas = [
@@ -1570,7 +1660,7 @@
                         id: generateId('PRB'),
                         fecha: formatDate(date),
                         descripcion: random(sampleProblems),
-                        causaRaiz: 'Análisis en progreso mediante técnica 5 Whys',
+                        causaRaiz: 'Análisis en progreso mediante técnica 5 Whys y diagrama Ishikawa',
                         responsable: random(responsables),
                         estado: random(['Abierto', 'En Análisis', 'Resuelto'])
                     };
@@ -1592,7 +1682,7 @@
                         descripcion: random(sampleRisks),
                         probabilidad: random(['Alta', 'Media', 'Baja']),
                         impacto: random(['Alto', 'Medio', 'Bajo']),
-                        mitigacion: 'Plan de mitigación definido y en seguimiento',
+                        mitigacion: 'Plan de mitigación definido con estrategias de transferencia, mitigación y aceptación',
                         responsableRiesgo: random(responsables),
                         categoria: random(['Técnico', 'Financiero', 'Operacional', 'Legal']),
                         estado: random(['Activo', 'Mitigado', 'Cerrado'])
@@ -1603,7 +1693,7 @@
                         id: generateId('MLT'),
                         fechaPlanificada: formatDate(date),
                         descripcion: random(sampleMilestones),
-                        entregable: 'Documento técnico y presentación ejecutiva',
+                        entregable: 'Documento técnico, presentación ejecutiva y evidencias de cumplimiento',
                         responsable: random(responsables),
                         estado: random(['Pendiente', 'En Progreso', 'Completado']),
                         progreso: Math.floor(Math.random() * 100)
@@ -1613,7 +1703,7 @@
                     return {
                         id: generateId('LCN'),
                         fecha: formatDate(date),
-                        situacion: 'Experiencia durante fase de ' + random(['desarrollo', 'testing', 'despliegue']),
+                        situacion: 'Experiencia durante fase de ' + random(['desarrollo', 'testing', 'despliegue', 'operación']),
                         leccion: random(sampleLessons),
                         categoria: random(pmbokAreas),
                         impacto: random(['Positivo', 'Negativo', 'Neutral'])
@@ -2167,6 +2257,55 @@
                     }
                 });
             }
+
+            // Gráfico 11: Evolución de Problemas
+            const ctx11 = document.getElementById('problemsEvolutionChart');
+            if (ctx11) {
+                charts.problemsEvolution = new Chart(ctx11.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+                        datasets: [{
+                            label: 'Problemas Abiertos',
+                            data: [12, 15, 10, 8],
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }, {
+                            label: 'Problemas Resueltos',
+                            data: [5, 8, 12, 15],
+                            borderColor: '#28a745',
+                            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true
+                    }
+                });
+            }
+
+            // Gráfico 12: Distribución de Severidad de Riesgos
+            const ctx12 = document.getElementById('riskSeverityChart');
+            if (ctx12) {
+                charts.riskSeverity = new Chart(ctx12.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Severidad Crítica', 'Severidad Media', 'Severidad Baja'],
+                        datasets: [{
+                            data: [0, 0, 0],
+                            backgroundColor: ['#dc3545', '#ffc107', '#28a745']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true
+                    }
+                });
+            }
         }
 
         function updateCharts() {
@@ -2283,6 +2422,19 @@
                 });
                 charts.lessons.data.datasets[0].data = data;
                 charts.lessons.update();
+            }
+
+            // Actualizar severidad de riesgos
+            if (charts.riskSeverity) {
+                const data = [0, 0, 0];
+                (allData.riesgos || []).forEach(risk => {
+                    const severity = calculateRiskSeverity(risk.probabilidad, risk.impacto);
+                    if (severity.class === 'danger') data[0]++;
+                    else if (severity.class === 'warning') data[1]++;
+                    else data[2]++;
+                });
+                charts.riskSeverity.data.datasets[0].data = data;
+                charts.riskSeverity.update();
             }
         }
 
@@ -2518,7 +2670,7 @@
         console.log('✅ Aplicación inicializada correctamente');
         console.log('📊 Simulación automática activada');
         console.log('⚡ Velocidad: ' + (simulationSpeed / 1000) + 's por registro');
-        console.log('📈 10 gráficos interactivos disponibles');
+        console.log('📈 12 gráficos interactivos disponibles en español');
     </script>
 </body>
 </html>
